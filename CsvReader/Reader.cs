@@ -4,52 +4,54 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CsvReader;
-public class Reader : IDisposable
+namespace CsvReader
 {
-    string filePath;
-    public Reader(string fileLocation)
+    public class Reader : IDisposable
     {
-        filePath = fileLocation;
-    }
-
-    public List<StockTradeBookDetail> GetData()
-    {
-        List<StockTradeBookDetail> data = new List<StockTradeBookDetail>();
-        using (var reader = new StreamReader(@filePath))
+        string filePath;
+        public Reader(string fileLocation)
         {
-            int rowCount = 0;
-            while (!reader.EndOfStream)
+            filePath = fileLocation;
+        }
+
+        public List<StockTradeBookDetail> GetData()
+        {
+            List<StockTradeBookDetail> data = new List<StockTradeBookDetail>();
+            using (var reader = new StreamReader(@filePath))
             {
-                var line = reader.ReadLine();
-                var values = line.Split(',');
-                if (rowCount > 0) // To Skip first row
+                int rowCount = 0;
+                while (!reader.EndOfStream)
                 {
-                    data.Add(new StockTradeBookDetail()
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    if (rowCount > 0) // To Skip first row
                     {
-                        StockPrice = double.Parse(values[int.Parse(Resources.Price)]),
-                        StockQuantity = double.Parse(values[int.Parse(Resources.Quantity)]),
-                        StockSymbol = GetStockSymbolName(values[int.Parse(Resources.Symbol)]),
-                        StockTradeDate = DateTime.Parse(values[int.Parse(Resources.TradeDate)]),
-                        StockTradeType = values[int.Parse(Resources.TradeType)],
-                    });
+                        data.Add(new StockTradeBookDetail()
+                        {
+                            StockPrice = double.Parse(values[int.Parse(Resources.Price)]),
+                            StockQuantity = double.Parse(values[int.Parse(Resources.Quantity)]),
+                            StockSymbol = GetStockSymbolName(values[int.Parse(Resources.Symbol)]),
+                            StockTradeDate = DateTime.Parse(values[int.Parse(Resources.TradeDate)]),
+                            StockTradeType = values[int.Parse(Resources.TradeType)],
+                        });
+                    }
+                    rowCount++;
                 }
-                rowCount++;
             }
+            return data;
         }
-        return data;
-    }
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-    private string GetStockSymbolName(string stockName)
-    {
-        if (stockName.Contains('-'))
+        public void Dispose()
         {
-            return stockName.Substring(0, stockName.IndexOf('-'));
+            throw new NotImplementedException();
         }
-        else return stockName;
-    }
+        private string GetStockSymbolName(string stockName)
+        {
+            if (stockName.Contains('-'))
+            {
+                return stockName.Substring(0, stockName.IndexOf('-'));
+            }
+            else return stockName;
+        }
 
+    }
 }
